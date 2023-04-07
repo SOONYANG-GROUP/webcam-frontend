@@ -247,6 +247,7 @@ const App = () => {
         delete pcsRef.current[user.id];
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 	return (
