@@ -247,7 +247,7 @@ const App = () => {
         delete pcsRef.current[user.id];
       })
     }
-  }, [ CreatePeerConnection, GetLocalStream, users]);
+  }, []);
 
 	return (
 		<div>
