@@ -4,9 +4,20 @@ import { useCallback, useRef, useState } from 'react';
 import { useEffect } from 'react';
 
 const pc_config = {
-
+  iceServers: [
+    {
+      urls: [
+        "stun:stun.l.google.com:19302",
+        "stun:stun1.l.google.com:19302",
+        "stun:stun2.l.google.com:19302",
+        "stun:stun3.l.google.com:19302",
+        "stun:stun4.l.google.com:19302"
+      ]
+    }
+  ]
 };
 const roomName = "1234"
+//const SOCKET_SERVER_URL = "http://localhost:5000";
 const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
 
 const Video = ({ stream, muted }) => {
