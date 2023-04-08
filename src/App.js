@@ -3,6 +3,7 @@ import io from "socket.io-client";
 import { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
 import Whiteboard from "./components/Whiteboard";
+import Draggable from "react-draggable";
 
 const pc_config = {
   iceServers: [
@@ -18,8 +19,8 @@ const pc_config = {
   ],
 };
 const roomName = "1234";
-//const SOCKET_SERVER_URL = "http://localhost:5000";
-const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
+const SOCKET_SERVER_URL = "http://localhost:5000";
+// const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
 
 const Video = ({ stream, muted }) => {
   const ref = useRef(null);
@@ -32,12 +33,22 @@ const Video = ({ stream, muted }) => {
 
   return (
     <>
-      <video
-        ref={ref}
-        muted={isMuted}
-        autoPlay
-        style={{ maxHeight: "23vh", maxWidth: "23vw" }}
-      />
+      <Draggable>
+        <video
+          className="border border-dark shadow p-1 mb-3 bg-body rounded"
+          ref={ref}
+          muted={isMuted}
+          autoPlay
+          style={{
+            maxHeight: "23vh",
+            maxWidth: "23vw",
+            border: "2px solid black",
+            boxShadow: " 0px 0px 10px rgba(0, 0, 0, 0.5)",
+            marginLight: "20px",
+            zIndex: "1",
+          }}
+        />
+      </Draggable>
     </>
   );
 };
@@ -46,11 +57,12 @@ const App = () => {
   const socketRef = useRef();
   const pcsRef = useRef({});
   const localVideoRef = useRef(null);
+  const DataChannel = useRef(); // eslint-disable-line no-unused-vars
   const localStreamRef = useRef();
   const [users, setUsers] = useState([]);
-  const [showWhiteboard, setShowWhiteboard] = useState(true); // 화이트 보드 표시 여부
-  const [isCameraOn, setIsCameraOn] = useState(true);
-  const [isMicOn, setIsMicOn] = useState(true);
+  const [showWhiteboard, setShowWhiteboard] = useState(true); // eslint-disable-line no-unused-vars
+  const [isCameraOn, setIsCameraOn] = useState(true); // eslint-disable-line no-unused-vars
+  const [isMicOn, setIsMicOn] = useState(true); // eslint-disable-line no-unused-vars
   const GetLocalStream = useCallback(async () => {
     try {
       // 로컬 스트림 정보 받아오기
@@ -249,33 +261,63 @@ const App = () => {
             width: "100%",
             height: "100%",
             backgroundColor: "white",
-            zIndex: 1, // set the zIndex to be above the video
+            zIndex: 1,
           }}
+          className="d-flex justify-content-center align-items-center"
         >
           {/* Whiteboard component */}
           <Whiteboard SOCKET_SERVER_URL={SOCKET_SERVER_URL} />
         </div>
       )}
-
       <div
         style={{
-          position: "fixed",
-          top: "15%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          zIndex: 2, // Assign zIndex to be positioned on the whiteboard
+          position: "absolute",
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: "15%",
+          display: "flex",
+          flexDirection: "column",
+          margin: "20px",
+          marginTop: "auto", // add this
+          zIndex: 1,
         }}
       >
-        <div>
-          <video
-            muted
-            ref={localVideoRef}
-            autoPlay
-            style={{ maxHeight: "23vh", maxWidth: "23vw" }}
-          />
-          {users.map((user, index) => (
-            <Video key={index} stream={user.stream} />
-          ))}
+        <div className="modal-dialog">
+          <div
+            className="modal-content"
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+            }}
+          >
+            <Draggable>
+              <video
+                muted
+                ref={localVideoRef}
+                autoPlay
+                className="border border-dark shadow p-1 mb-3 bg-body rounded"
+                style={{
+                  maxHeight: "23vh",
+                  maxWidth: "23vw",
+                  border: "1px solid black",
+                  boxShadow: " 0px 0px 10px rgba(0, 0, 0, 0.5)",
+                  marginLight: "20px",
+                  zIndex: "1",
+                  marginTop: "20px",
+                }}
+              />
+            </Draggable>
+            {users.map((user, index) => (
+              <Video key={index} stream={user.stream} />
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="fixed-bottom bg-primary mb-3 d-flex justify-content-center bg-opacity-50">
+        <div className="text-light text-center p-3">
+          <i class="fa-duotone fa-microphone"></i>
         </div>
       </div>
     </div>

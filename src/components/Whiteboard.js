@@ -8,23 +8,15 @@ function Whiteboard() {
   const [lineWidth, setLineWidth] = useState(5);
   const socketRef = useRef();
   const canvasRef = useRef();
-  const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
-  const [zoom, setZoom] = useState(1);
+  //const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
+  const SOCKET_SERVER_URL = "http://localhost:5000";
+
   useEffect(() => {
     socketRef.current = io(SOCKET_SERVER_URL);
     socketRef.current.on("whiteboard-data", (data) => {
       setLines((prevLines) => [...prevLines, data]);
     });
   }, [SOCKET_SERVER_URL]);
-
-  const onMouseWheel = (e) => {
-    e.preventDefault();
-    if (e.nativeEvent.wheelDelta > 0) {
-      setZoom((prevZoom) => prevZoom + 0.1);
-    } else {
-      setZoom((prevZoom) => Math.max(0.1, prevZoom - 0.1));
-    }
-  };
 
   const handleMouseDown = (event) => {
     setDrawing(true);
