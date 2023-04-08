@@ -19,7 +19,6 @@ function Whiteboard({
 
   useEffect(() => {
     socketRef.current = io(SOCKET_SERVER_URL);
-
     socketRef.current.on("whiteboard-data", (data) => {
       setLines((prevLines) => [...prevLines, data]);
     });
