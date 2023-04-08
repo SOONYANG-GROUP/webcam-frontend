@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
-
-function Whiteboard({
-  pcsRef,
-  lines,
-  setLines,
-  dataChannel
-}) {
+import BackGround from "../assets/images/Loading.jpg";
+function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
   const [drawing, setDrawing] = useState(false);
 
   const [strokeColor, setStrokeColor] = useState("#000000");
@@ -33,9 +28,7 @@ function Whiteboard({
       points: [getMousePosition(event)],
     };
     setLines((prevLines) => [...prevLines, newLine]);
-    socketRef.current.emit("whiteboard-data", newLine);
     dataChannel.current.send(JSON.stringify(newLine));
-
   };
 
   const handleMouseMove = (event) => {
@@ -43,7 +36,6 @@ function Whiteboard({
     const newLine = { ...lines[lines.length - 1] };
     newLine.points.push(getMousePosition(event));
     setLines((prevLines) => [...prevLines.slice(0, -1), newLine]);
-    socketRef.current.emit("whiteboard-data", newLine);
     dataChannel.current.send(JSON.stringify(newLine));
   };
 
@@ -68,7 +60,7 @@ function Whiteboard({
   };
 
   function drawLine(context, points, strokeColor, lineWidth) {
-    console.log('hi')
+    console.log("hi");
     context.beginPath();
     context.moveTo(points[0].x, points[0].y);
     points.slice(1).forEach((point) => {
@@ -80,7 +72,7 @@ function Whiteboard({
     context.lineCap = "round";
     context.stroke();
   }
-  
+
   useEffect(() => {
     if (!canvasRef.current) return;
 
@@ -90,8 +82,7 @@ function Whiteboard({
     });
   }, [lines]);
 
-  if(Object.keys(pcsRef.current).length !== 0)
-  {
+  if (Object.keys(pcsRef.current).length !== 0) {
     return (
       <div
         style={{
@@ -135,24 +126,23 @@ function Whiteboard({
             value={lineWidth}
             onChange={handleLineWidthChange}
           />
-          <button onClick={(e) => {
-            dataChannel.current.send("hi")
-          }}>
+          <button
+            onClick={(e) => {
+              dataChannel.current.send("hi");
+            }}
+          >
             asfsadf
           </button>
         </div>
       </div>
     );
-  }
-  else
-  {
-    return(
+  } else {
+    return (
       <div>
-
+        <img src={BackGround} alt="My" />
       </div>
-    )
+    );
   }
 }
-
 
 export default Whiteboard;
