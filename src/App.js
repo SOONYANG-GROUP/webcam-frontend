@@ -133,37 +133,6 @@ const App = () => {
     }
   }, []);
 
-  const BottomBar = () => {
-    return (
-      <div
-        style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 40,
-          backgroundColor: "white",
-          display: "flex",
-          justifyContent: "space-between",
-          padding: "0 20px",
-          zIndex: 1,
-        }}
-      >
-        <div>
-          <button onClick={() => setIsCameraOn(!isCameraOn)}>
-            {isCameraOn ? "Turn camera off" : "Turn camera on"}
-          </button>
-          <button onClick={() => setIsMicOn(!isMicOn)}>
-            {isMicOn ? "Turn microphone off" : "Turn microphone on"}
-          </button>
-        </div>
-        <div>
-          {/* Add any other buttons or components for the bottom bar here */}
-        </div>
-      </div>
-    );
-  };
-
   useEffect(() => {
     socketRef.current = io.connect(SOCKET_SERVER_URL);
     GetLocalStream();
@@ -309,7 +278,6 @@ const App = () => {
           ))}
         </div>
       </div>
-      <BottomBar />
     </div>
   );
 };
