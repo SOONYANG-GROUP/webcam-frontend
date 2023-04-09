@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
-import BackGround from "../assets/images/Loading.jpg";
+// import BackGround from "../assets/images/Loading.jpg";
+import FadeLoader from "react-spinners/FadeLoader";
 function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
   const [drawing, setDrawing] = useState(false);
 
@@ -139,7 +140,36 @@ function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
   } else {
     return (
       <div>
-        <img src={BackGround} alt="My" />
+        <div class="contentWrap">
+          <div
+            style={{
+              position: "fixed",
+              top: "40%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              fontWeight: "700",
+            }}
+          >
+            팀원을 기다리는 중입니다.
+          </div>
+
+          <div
+            style={{
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <FadeLoader
+              color="#C63DEE"
+              height={15}
+              width={5}
+              radius={2}
+              margin={2}
+            />
+          </div>
+        </div>
       </div>
     );
   }
