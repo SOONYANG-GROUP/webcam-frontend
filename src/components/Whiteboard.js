@@ -33,7 +33,7 @@ function Whiteboard({
       points: [getMousePosition(event)],
     };
     setLines((prevLines) => [...prevLines, newLine]);
-    socketRef.current.emit("whiteboard-data", newLine);
+    //socketRef.current.emit("whiteboard-data", newLine);
     dataChannel.current.send(JSON.stringify(newLine));
 
   };
@@ -43,7 +43,7 @@ function Whiteboard({
     const newLine = { ...lines[lines.length - 1] };
     newLine.points.push(getMousePosition(event));
     setLines((prevLines) => [...prevLines.slice(0, -1), newLine]);
-    socketRef.current.emit("whiteboard-data", newLine);
+    //socketRef.current.emit("whiteboard-data", newLine);
     dataChannel.current.send(JSON.stringify(newLine));
   };
 
