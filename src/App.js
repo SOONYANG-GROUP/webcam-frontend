@@ -112,7 +112,7 @@ const App = () => {
 
       // event 생성 중
       pc.oniceconnectionstatechange = (e) => {
-        console.log(e);
+        //console.log(e);
       };
 
       // event 생성 중
@@ -167,7 +167,6 @@ const App = () => {
         try {
 
           // Create Channel
-
           dataChannel.current = pc.createDataChannel("chat");
           dataChannel.current.addEventListener("message", (event) => {
             setLines((prevLines) => [...prevLines, JSON.parse(event.data)]);
@@ -203,15 +202,30 @@ const App = () => {
       if (!(pc && socketRef.current)) return;
       // 새 관계(pc) 저장하기
       pcsRef.current = { ...pcsRef.current, [offerSendID]: pc };
+
       try {
 
+        //for(const pc in pcsRef.current)
+        //{
+        //  // Data Channel 만들기
+        //  pcsRef.current[pc].addEventListener("datachannel", (event) => {
+        //    dataChannel.current = event.channel;
+        //    dataChannel.current.addEventListener("message", (event) => {
+        //      setLines((prevLines) => [...prevLines, JSON.parse(event.data)]);
+        //      
+        //      //console.log(event.data);
+        //    })
+        //  });
+        //  console.log("peer b data channel creates")
+        //}
+        
         // Data Channel 만들기
         pc.addEventListener("datachannel", (event) => {
           dataChannel.current = event.channel;
           dataChannel.current.addEventListener("message", (event) => {
             setLines((prevLines) => [...prevLines, JSON.parse(event.data)]);
-
             
+            //console.log(event.data);
           })
         });
         console.log("peer b data channel creates")

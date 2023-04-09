@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import io from "socket.io-client";
+//import io from "socket.io-client";
 // import BackGround from "../assets/images/Loading.jpg";
 import FadeLoader from "react-spinners/FadeLoader";
 function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
@@ -8,7 +8,7 @@ function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
   const [strokeColor, setStrokeColor] = useState("#000000");
   const [lineWidth, setLineWidth] = useState(5);
   //const [lines, setLines] = useState([]);
-  const socketRef = useRef();
+  //const socketRef = useRef();
   const canvasRef = useRef();
   //const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
   //const SOCKET_SERVER_URL = "http://localhost:5000";
@@ -30,6 +30,7 @@ function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
     };
     setLines((prevLines) => [...prevLines, newLine]);
     dataChannel.current.send(JSON.stringify(newLine));
+    //dataChannel.current.send(JSON.stringify(lines));
   };
 
   const handleMouseMove = (event) => {
@@ -38,7 +39,10 @@ function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
     newLine.points.push(getMousePosition(event));
     setLines((prevLines) => [...prevLines.slice(0, -1), newLine]);
     dataChannel.current.send(JSON.stringify(newLine));
+    //dataChannel.current.send(JSON.stringify(lines));
   };
+
+  console.log(lines)
 
   const handleMouseUp = () => {
     setDrawing(false);
@@ -75,7 +79,6 @@ function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
 
   useEffect(() => {
     if (!canvasRef.current) return;
-
     const context = canvasRef.current.getContext("2d");
     lines.forEach((line) => {
       drawLine(context, line.points, line.color, line.size);
@@ -103,6 +106,7 @@ function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
             position: "absolute",
             top: 0,
             left: 0,
+            border: '1px solid black'
           }}
           width={window.innerWidth}
           height={window.innerHeight}
