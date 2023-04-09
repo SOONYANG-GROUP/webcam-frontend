@@ -18,7 +18,7 @@ function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
     socketRef.current.on("whiteboard-data", (data) => {
       setLines((prevLines) => [...prevLines, data]);
     });
-  }, [SOCKET_SERVER_URL]);
+  }, [SOCKET_SERVER_URL, setLines]);
 
   const handleMouseDown = (event) => {
     setDrawing(true);
@@ -61,7 +61,6 @@ function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
   };
 
   function drawLine(context, points, strokeColor, lineWidth) {
-    console.log("hi");
     context.beginPath();
     context.moveTo(points[0].x, points[0].y);
     points.slice(1).forEach((point) => {
@@ -127,20 +126,13 @@ function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
             value={lineWidth}
             onChange={handleLineWidthChange}
           />
-          <button
-            onClick={(e) => {
-              dataChannel.current.send("hi");
-            }}
-          >
-            asfsadf
-          </button>
         </div>
       </div>
     );
   } else {
     return (
       <div>
-        <div class="contentWrap">
+        <div className="contentWrap">
           <div
             style={{
               position: "fixed",

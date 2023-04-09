@@ -7,22 +7,21 @@ import Draggable from "react-draggable";
 
 const pc_config = {
   iceServers: [
-    //{
-    //  urls: [
-    //    "stun:stun.l.google.com:19302",
-    //    "stun:stun1.l.google.com:19302",
-    //    "stun:stun2.l.google.com:19302",
-    //    "stun:stun3.l.google.com:19302",
-    //    "stun:stun4.l.google.com:19302",
-    //  ],
-    //},
+    {
+      urls: [
+        "stun:stun.l.google.com:19302",
+        "stun:stun1.l.google.com:19302",
+        "stun:stun2.l.google.com:19302",
+        "stun:stun3.l.google.com:19302",
+        "stun:stun4.l.google.com:19302",
+      ],
+    },
   ],
 };
 const roomName = "1234";
-const SOCKET_SERVER_URL = "http://localhost:5000";
-//const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
+//const SOCKET_SERVER_URL = "http://localhost:5000";
+const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
 
-let myDataChannel = {};
 
 const Video = ({ stream, muted }) => {
   const ref = useRef(null);
@@ -151,8 +150,6 @@ const App = () => {
     }
   }, []);
 
-  console.log(pcsRef.current)
-
   useEffect(() => {
     socketRef.current = io.connect(SOCKET_SERVER_URL);
     GetLocalStream();
@@ -279,14 +276,6 @@ const App = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const onClickTmpBtn = (e) => {
-    console.log("click");
-    console.log(myDataChannel);
-    myDataChannel.send("send");
-  }
-
-  
 
   return (
     <div>
