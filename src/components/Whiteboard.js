@@ -11,14 +11,14 @@ function Whiteboard({ pcsRef, lines, setLines, dataChannel }) {
   const socketRef = useRef();
   const canvasRef = useRef();
   //const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
-  const SOCKET_SERVER_URL = "http://localhost:5000";
+  //const SOCKET_SERVER_URL = "http://localhost:5000";
 
-  useEffect(() => {
-    socketRef.current = io(SOCKET_SERVER_URL);
-    socketRef.current.on("whiteboard-data", (data) => {
-      setLines((prevLines) => [...prevLines, data]);
-    });
-  }, [SOCKET_SERVER_URL, setLines]);
+  //useEffect(() => {
+  //  //socketRef.current = io(SOCKET_SERVER_URL);
+  //  //socketRef.current.on("whiteboard-data", (data) => {
+  //  //  setLines((prevLines) => [...prevLines, data]);
+  //  //});
+  //}, [SOCKET_SERVER_URL, setLines]);
 
   const handleMouseDown = (event) => {
     setDrawing(true);
