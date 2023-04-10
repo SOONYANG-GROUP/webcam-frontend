@@ -4,7 +4,8 @@ import { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
 import Whiteboard from "./components/Whiteboard";
 import Draggable from "react-draggable";
-
+import { ResizableBox } from "react-resizable";
+import { Rnd } from "react-rnd";
 const pc_config = {
   iceServers: [
     {
@@ -22,35 +23,54 @@ const roomName = "1234";
 //const SOCKET_SERVER_URL = "http://localhost:5000";
 const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
 
-
-const Video = ({ stream, muted }) => {
+const Video = ({ stream, muted, xPosition, yPosition }) => {
   const ref = useRef(null);
   const [isMuted, setIsMuted] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     if (ref.current) ref.current.srcObject = stream;
     if (muted) setIsMuted(muted);
-  }, [stream, muted]);
+    setIsLoading(false);
+  }, [stream, muted, xPosition, yPosition]);
+
+  if (isLoading) {
+    return <></>;
+  }
+
+  const MuteBtn = () => {
+    console.log(isMuted);
+    setIsMuted(!isMuted);
+  };
 
   return (
     <>
-      <Draggable>
+      <Rnd
+        default={{
+          x: xPosition,
+          y: yPosition,
+          width: 320,
+          height: "auto",
+        }}
+        style={{ zIndex: 2 }}
+      >
         <video
-          className="border border-dark shadow p-1 mb-3 bg-body rounded"
-          ref={ref}
           muted={isMuted}
+          ref={ref}
           autoPlay
-          style={{
-            maxHeight: "23vh",
-            maxWidth: "23vw",
-            border: "2px solid black",
-            boxShadow: " 0px 0px 10px rgba(0, 0, 0, 0.5)",
-            marginLight: "20px",
-            zIndex: "1",
-          }}
+          style={{ width: "100%", height: "100%" }}
         />
-      </Draggable>
+        {isMuted ? (
+          <>
+            <button onClick={MuteBtn}>마이크 온~</button>
+          </>
+        ) : (
+          <>
+            <button onClick={MuteBtn}>음소거~</button>
+          </>
+        )}
+      </Rnd>
     </>
   );
 };
@@ -66,8 +86,7 @@ const App = () => {
   const [isCameraOn, setIsCameraOn] = useState(true); // eslint-disable-line no-unused-vars
   const [isMicOn, setIsMicOn] = useState(true); // eslint-disable-line no-unused-vars
   const [lines, setLines] = useState([]);
-  
-
+  const [isMuted, setIsMuted] = useState(false);
   const GetLocalStream = useCallback(async () => {
     try {
       // 로컬 스트림 정보 받아오기
@@ -86,7 +105,22 @@ const App = () => {
     }
   }, []);
 
+  const MuteBtn = () => {
+    setIsMuted(!isMuted);
+    localStreamRef.current.getAudioTracks().forEach((track) => {
+      track.enabled = !isMuted;
+    });
+    GetLocalStream();
+  };
+  const VideoBtn = () => {
+    setIsCameraOn(!isCameraOn);
+    localStreamRef.current.getVideoTracks().forEach((track) => {
+      track.enabled = isCameraOn;
+    });
+    GetLocalStream();
+  };
   const CreatePeerConnection = useCallback((socketID) => {
+    console.log(socketID);
     try {
       // Create Peer Connection (관계)
       const pc = new RTCPeerConnection(pc_config);
@@ -165,7 +199,6 @@ const App = () => {
         // 새로운 Peer Connection을 pcs(pc 모음)에 관리
         pcsRef.current = { ...pcsRef.current, [user.id]: pc };
         try {
-
           // Create Channel
 
           dataChannel.current = pc.createDataChannel("chat");
@@ -204,17 +237,14 @@ const App = () => {
       // 새 관계(pc) 저장하기
       pcsRef.current = { ...pcsRef.current, [offerSendID]: pc };
       try {
-
         // Data Channel 만들기
         pc.addEventListener("datachannel", (event) => {
           dataChannel.current = event.channel;
           dataChannel.current.addEventListener("message", (event) => {
             setLines((prevLines) => [...prevLines, JSON.parse(event.data)]);
-
-            
-          })
+          });
         });
-        console.log("peer b data channel creates")
+        console.log("peer b data channel creates");
 
         // 매개변수 꼭 확인하기!
         await pc.setRemoteDescription(new RTCSessionDescription(sdp));
@@ -241,7 +271,6 @@ const App = () => {
       const { sdp, answerSendID } = data;
       console.log("Get Answer");
       const pc = pcsRef.current[answerSendID];
-
 
       if (!pc) return;
       // 매개 변수 꼭 확인하기!
@@ -279,7 +308,6 @@ const App = () => {
 
   return (
     <div>
-
       {showWhiteboard && (
         <div
           style={{
@@ -293,10 +321,9 @@ const App = () => {
           }}
           className="d-flex justify-content-center align-items-center"
         >
-
           {/* Whiteboard component */}
-          <Whiteboard 
-            SOCKET_SERVER_URL={SOCKET_SERVER_URL} 
+          <Whiteboard
+            SOCKET_SERVER_URL={SOCKET_SERVER_URL}
             dataChannel={dataChannel}
             lines={lines}
             pcsRef={pcsRef}
@@ -304,54 +331,42 @@ const App = () => {
           />
         </div>
       )}
-      <div
-        style={{
-          position: "absolute",
-          right: 0,
-          top: 0,
-          bottom: 0,
-          width: "15%",
-          display: "flex",
-          flexDirection: "column",
-          margin: "20px",
-          marginTop: "auto", // add this
-          zIndex: 1,
-        }}
-      >
-        <div className="modal-dialog">
-          <div
-            className="modal-content"
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              alignItems: "center",
-            }}
-          >
-            <Draggable>
-              <video
-                muted
-                ref={localVideoRef}
-                autoPlay
-                className="border border-dark shadow p-1 mb-3 bg-body rounded"
-                style={{
-                  maxHeight: "23vh",
-                  maxWidth: "23vw",
-                  border: "1px solid black",
-                  boxShadow: " 0px 0px 10px rgba(0, 0, 0, 0.5)",
-                  marginLight: "20px",
-                  zIndex: "1",
-                  marginTop: "20px",
-                }}
-              />
-            </Draggable>
-            {users.map((user, index) => (
-              <Video key={index} stream={user.stream} />
-            ))}
-          </div>
-        </div>
-      </div>
+      <div>
+        <Rnd
+          className="border"
+          default={{
+            x: 1600,
+            y: 30,
+            width: 320,
+            height: "auto",
+          }}
+          style={{ zIndex: 2 }}
+        >
+          <video
+            muted={true}
+            ref={localVideoRef}
+            autoPlay
+            style={{ width: "100%", height: "100%" }}
+          />
+          <button onClick={MuteBtn}>{isMuted ? "Unmute" : "Mute"}</button>
+          <button onClick={VideoBtn}>
+            {isCameraOn ? "Turn off camera" : "Turn on camera"}
+          </button>
+        </Rnd>
 
-      <div className="fixed-bottom bg-primary mb-3 d-flex justify-content-center bg-opacity-50">
+        {users.map((user, index) => (
+          <Video
+            key={index}
+            stream={user.stream}
+            xPosition={1600}
+            yPosition={(index + 1) * 300 + 30}
+          />
+        ))}
+      </div>
+      <div
+        className="fixed-bottom bg-primary mb-3 d-flex justify-content-center bg-opacity-50"
+        style={{ zIndex: 3 }}
+      >
         <div className="text-light text-center p-3">
           <i className="fa-duotone fa-microphone"></i>
         </div>
