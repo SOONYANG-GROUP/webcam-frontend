@@ -2,9 +2,7 @@ import "./App.css";
 import io from "socket.io-client";
 import { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
-import Whiteboard from "./components/Whiteboard";
-import Draggable from "react-draggable";
-import { ResizableBox } from "react-resizable";
+
 import { Rnd } from "react-rnd";
 const pc_config = {
   iceServers: [
@@ -19,6 +17,7 @@ const pc_config = {
     },
   ],
 };
+
 const roomName = "1234";
 //const SOCKET_SERVER_URL = "http://localhost:5000";
 const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
@@ -43,14 +42,23 @@ const Video = ({ stream, muted, xPosition, yPosition }) => {
     console.log(isMuted);
     setIsMuted(!isMuted);
   };
+  const parentElement = document.querySelector(".parent-element");
+  let defaultX = 0;
+  let defaultY = 0;
 
+  if (parentElement) {
+    const parentWidth = parentElement.offsetWidth;
+    const parentHeight = parentElement.offsetHeight;
+    defaultX = parentWidth / 2 - 160; // Subtract half of the Rnd component's width
+    defaultY = parentHeight / 2 - 160; // Subtract half of the Rnd component's height
+  }
   return (
     <>
       <Rnd
         default={{
-          x: xPosition,
-          y: yPosition,
-          width: 320,
+          x: defaultX,
+          y: defaultY,
+          width: "320",
           height: "auto",
         }}
         style={{ zIndex: 2 }}
@@ -61,15 +69,6 @@ const Video = ({ stream, muted, xPosition, yPosition }) => {
           autoPlay
           style={{ width: "100%", height: "100%" }}
         />
-        {isMuted ? (
-          <>
-            <button onClick={MuteBtn}>마이크 온~</button>
-          </>
-        ) : (
-          <>
-            <button onClick={MuteBtn}>음소거~</button>
-          </>
-        )}
       </Rnd>
     </>
   );
@@ -87,6 +86,7 @@ const App = () => {
   const [isMicOn, setIsMicOn] = useState(true); // eslint-disable-line no-unused-vars
   const [lines, setLines] = useState([]);
   const [isMuted, setIsMuted] = useState(false);
+
   const GetLocalStream = useCallback(async () => {
     try {
       // 로컬 스트림 정보 받아오기
@@ -306,69 +306,67 @@ const App = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const parentElement = document.querySelector(".parent-element");
+  let defaultX = 0;
+  let defaultY = 0;
+
+  if (parentElement) {
+    const parentWidth = parentElement.offsetWidth;
+    const parentHeight = parentElement.offsetHeight;
+    defaultX = parentWidth / 2 - 160; // Subtract half of the Rnd component's width
+    defaultY = parentHeight / 2 - 160; // Subtract half of the Rnd component's height
+  }
   return (
     <div>
-      {showWhiteboard && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "white",
-            zIndex: 1,
-          }}
-          className="d-flex justify-content-center align-items-center"
-        >
-          {/* Whiteboard component */}
-          <Whiteboard
-            SOCKET_SERVER_URL={SOCKET_SERVER_URL}
-            dataChannel={dataChannel}
-            lines={lines}
-            pcsRef={pcsRef}
-            setLines={setLines}
-          />
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-8 mb-3">
+            <Rnd
+              default={{
+                x: 0,
+                y: defaultY,
+                width: 320,
+                height: "auto",
+              }}
+              style={{
+                zIndex: 2,
+              }}
+              lockAspectRatio={true}
+            >
+              <video
+                muted={true}
+                ref={localVideoRef}
+                autoPlay
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "transparent",
+                  boreder: "nonde",
+                }}
+              />
+            </Rnd>
+          </div>
+          <div class="col-12 mb-3">
+            {users.map((user, index) => (
+              <Video
+                key={index}
+                stream={user.stream}
+                xPosition={1600}
+                yPosition={(index + 1) * 300 + 30}
+              />
+            ))}
+          </div>
         </div>
-      )}
-      <div>
-        <Rnd
-          className="border"
-          default={{
-            x: 1600,
-            y: 30,
-            width: 320,
-            height: "auto",
-          }}
-          style={{ zIndex: 2 }}
-        >
-          <video
-            muted={true}
-            ref={localVideoRef}
-            autoPlay
-            style={{ width: "100%", height: "100%" }}
-          />
-          <button onClick={MuteBtn}>{isMuted ? "Unmute" : "Mute"}</button>
-          <button onClick={VideoBtn}>
-            {isCameraOn ? "Turn off camera" : "Turn on camera"}
-          </button>
-        </Rnd>
-
-        {users.map((user, index) => (
-          <Video
-            key={index}
-            stream={user.stream}
-            xPosition={1600}
-            yPosition={(index + 1) * 300 + 30}
-          />
-        ))}
       </div>
-      <div
-        className="fixed-bottom bg-primary mb-3 d-flex justify-content-center bg-opacity-50"
-        style={{ zIndex: 3 }}
-      >
-        <div className="text-light text-center p-3">
-          <i className="fa-duotone fa-microphone"></i>
+      <div class="fixed-bottom bg-primary mb-3 d-flex justify-content-around align-items-center bg-opacity-50">
+        <button onClick={MuteBtn} class="btn btn-light">
+          {isMuted ? "Unmute" : "Mute"}
+        </button>
+        <button onClick={VideoBtn} class="btn btn-light">
+          {isCameraOn ? "Turn off camera" : "Turn on camera"}
+        </button>
+        <div className="text-light">
+          <i className="fa-duotone fa-microphone fa-lg"></i>
         </div>
       </div>
     </div>
