@@ -16,7 +16,7 @@ const pc_config = {
   //  },
   //],
 };
-const roomName = "1234";
+//const roomName = "1234";
 const SOCKET_SERVER_URL = "http://localhost:5000";
 //const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
 
@@ -74,8 +74,7 @@ const Video = ({ stream, muted, xPosition, yPosition }) => {
 
 const Room = () => {
   const location = useLocation();
-  console.log(location.pathname);
-
+  const roomName = location.pathname.split('/')[2];
   const socketRef = useRef();
   const pcsRef = useRef({});
   const localVideoRef = useRef(null);
