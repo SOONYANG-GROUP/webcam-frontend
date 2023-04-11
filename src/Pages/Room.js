@@ -21,6 +21,17 @@ const SOCKET_SERVER_URL = "http://localhost:5000";
 //const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
 
 
+const RoomHeader = ({
+  myMemo,
+  onChangeMyMemo
+}) => {
+  return(
+    <header>
+      
+    </header>
+  )
+}
+
 const RoomVideosSection = ({
   users,
   isMuted,
@@ -30,7 +41,7 @@ const RoomVideosSection = ({
   VideoBtn
 }) => {
   return(
-    <div>
+    <section>
       <div>
         <Rnd
           className="border"
@@ -72,7 +83,7 @@ const RoomVideosSection = ({
             />
           ))}
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -149,14 +160,19 @@ const Room = () => {
   const socketRef = useRef();
   const pcsRef = useRef({});
   const localVideoRef = useRef(null);
-  const dataChannel = useRef(); // eslint-disable-line no-unused-vars
   const localStreamRef = useRef();
   const [users, setUsers] = useState([]);
-  const [showWhiteboard, setShowWhiteboard] = useState(true); // eslint-disable-line no-unused-vars
   const [isCameraOn, setIsCameraOn] = useState(true); // eslint-disable-line no-unused-vars
-  const [isMicOn, setIsMicOn] = useState(true); // eslint-disable-line no-unused-vars
-  const [lines, setLines] = useState([]);
   const [isMuted, setIsMuted] = useState(false);
+
+  // Menu
+  const [ isMenuOn, setIsMenuOn ] = useState(false);
+  const [ myMemo, setMyMemo ] = useState("");
+
+  const onChangeMyMemo = (e) => {
+    setMyMemo(e.target.value);
+  }
+
   const GetLocalStream = useCallback(async () => {
     try {
       // 로컬 스트림 정보 받아오기
@@ -376,9 +392,11 @@ const Room = () => {
   }, []);
 
   return (
-    <div>
+    <div className="container">
 
-
+      <RoomHeader 
+        
+      />
       <RoomVideosSection 
         users={users}
         isMuted={isMuted}
