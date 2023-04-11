@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Rnd } from "react-rnd";
+
 const pc_config = {
   //iceServers: [
   //  {
@@ -20,17 +21,9 @@ const pc_config = {
 const SOCKET_SERVER_URL = "http://localhost:5000";
 //const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
 
-
-const RoomHeader = ({
-  myMemo,
-  onChangeMyMemo
-}) => {
-  return(
-    <header>
-      
-    </header>
-  )
-}
+const RoomHeader = ({ myMemo, onChangeMyMemo }) => {
+  return <header></header>;
+};
 
 const RoomVideosSection = ({
   users,
@@ -38,69 +31,77 @@ const RoomVideosSection = ({
   isCameraOn,
   localVideoRef,
   MuteBtn,
-  VideoBtn
+  VideoBtn,
 }) => {
-  return(
-    <section>
-      <div>
+  return (
+    <>
+      <section
+        style={{ height: "100vh", width: "100vw", backgroundColor: "black" }}
+      >
         <Rnd
-          className="border"
           default={{
-            x: 1600,
-            y: 30,
-            width: 320,
-            height: "auto"
+            x: window.innerWidth / 2 - window.innerWidth / 8,
+            y: window.innerHeight / 2 - window.innerHeight / 4,
+            width: window.innerWidth / 4,
+            height: "auto",
+            lockAspectRatio: true,
           }}
-          style={{ 
-            zIndex: 2,
-          }}
+          style={{ zIndex: 2 }}
+          bounds="body"
+          lockAspectRatio="true"
         >
           <video
             muted={true}
             ref={localVideoRef}
             autoPlay
-            style={{ 
-              width: "100%", 
-              height: "100%",
-              borderRadius: "10%"
-            }}
-          >
-            <button onClick={MuteBtn}>{isMuted ? (
-              <i className="fa-solid fa-microphone"></i>
-            ) : (<i className="fa-solid fa-microphone-slash"></i>)}</button>
-            <button onClick={VideoBtn}>{isCameraOn ? (<i className="fa-solid fa-camera-slash"></i>)
-            : (<i className="fa-solid fa-camera"></i>)}</button>
-          </video>
+            style={{ width: "100%", height: "100%" }}
+          />
         </Rnd>
-      </div>
-      <div>
-          {users.map((user, index) => (
-            <Video 
+
+        {users.map((user, index) => (
+          <Rnd
+            key={index}
+            default={{
+              x: Math.random() * (window.innerWidth - 320),
+              y: Math.random() * (window.innerHeight - 320),
+              width:
+                Math.floor(
+                  Math.random() *
+                    (window.innerWidth / 6 - window.innerWidth / 10 + 1)
+                ) +
+                window.innerWidth / 9,
+              height: "auto",
+              lockAspectRatio: true,
+            }}
+            lockAspectRatio="true"
+            style={{ zIndex: 2 }}
+            bounds="section"
+          >
+            <Video
               key={index}
               stream={user.stream}
               xPosition={1600}
               yPosition={(index + 1) * 300 + 30}
             />
-          ))}
-      </div>
-    </section>
-  )
-}
+          </Rnd>
+        ))}
+      </section>
+    </>
+  );
+};
 
 const RoomFooter = () => {
-  return(
+  return (
     <footer>
-        <div
-          className="fixed-bottom bg-primary mb-3 d-flex justify-content-center bg-opacity-50"
-          style={{ zIndex: 3 }}
-        >
-        <div className="text-light text-center p-3">
-          <i className="fa-duotone fa-microphone"></i>
-        </div>
+      <div
+        className="fixed-bottom bg-primary mb-3 d-flex justify-content-center bg-opacity-50"
+        style={{ zIndex: 3, color: "white" }}
+      >
+        asd
       </div>
     </footer>
-  )
-}
+  );
+};
 
 const Video = ({ stream, muted, xPosition, yPosition }) => {
   const ref = useRef(null);
@@ -125,38 +126,28 @@ const Video = ({ stream, muted, xPosition, yPosition }) => {
 
   return (
     <>
-      <Rnd
-        default={{
-          x: xPosition,
-          y: yPosition,
-          width: 320,
-          height: "auto",
-        }}
-        style={{ zIndex: 2 }}
-      >
-        <video
-          muted={isMuted}
-          ref={ref}
-          autoPlay
-          style={{ width: "100%", height: "100%" }}
-        />
-        {isMuted ? (
-          <>
-            <button onClick={MuteBtn}>마이크 온~</button>
-          </>
-        ) : (
-          <>
-            <button onClick={MuteBtn}>음소거~</button>
-          </>
-        )}
-      </Rnd>
+      <video
+        muted={isMuted}
+        ref={ref}
+        autoPlay
+        style={{ width: "100%", height: "100%" }}
+      />
+      {/* {isMuted ? (
+        <>
+          <button onClick={MuteBtn}>마이크 온~</button>
+        </>
+      ) : (
+        <>
+          <button onClick={MuteBtn}>음소거~</button>
+        </>
+      )} */}
     </>
   );
 };
 
 const Room = () => {
   const location = useLocation();
-  const roomName = location.pathname.split('/')[2];
+  const roomName = location.pathname.split("/")[2];
   const socketRef = useRef();
   const pcsRef = useRef({});
   const localVideoRef = useRef(null);
@@ -166,12 +157,12 @@ const Room = () => {
   const [isMuted, setIsMuted] = useState(false);
 
   // Menu
-  const [ isMenuOn, setIsMenuOn ] = useState(false);
-  const [ myMemo, setMyMemo ] = useState("");
+  const [isMenuOn, setIsMenuOn] = useState(false);
+  const [myMemo, setMyMemo] = useState("");
 
   const onChangeMyMemo = (e) => {
     setMyMemo(e.target.value);
-  }
+  };
 
   const GetLocalStream = useCallback(async () => {
     try {
@@ -392,12 +383,9 @@ const Room = () => {
   }, []);
 
   return (
-    <div className="container">
-
-      <RoomHeader 
-        
-      />
-      <RoomVideosSection 
+    <>
+      <RoomHeader />
+      <RoomVideosSection
         users={users}
         isMuted={isMuted}
         isCameraOn={isCameraOn}
@@ -406,11 +394,8 @@ const Room = () => {
         VideoBtn={VideoBtn}
       />
 
-
       <RoomFooter />
-
-
-    </div>
+    </>
   );
 };
 
