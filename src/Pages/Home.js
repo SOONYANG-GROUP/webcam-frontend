@@ -11,6 +11,11 @@ const Home = () => {
         setRoomName(e.target.value);
     }
 
+    const onSubmit = (e) => {
+        e.preventDefault();
+        window.location.href = `/room/${roomName}`;
+    }
+
     return(
         <div className="container" >
             <section   
@@ -45,7 +50,7 @@ const Home = () => {
                 alignItems: "center",
                 justifyContent: "center",
             }}>
-                <form>
+                <form onSubmit={onSubmit}>
                     <input 
                         className="form-control w-100"
                         placeholder="방 번호 입력"
