@@ -3,6 +3,9 @@ import { useCallback, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Rnd } from "react-rnd";
+import { CiMicrophoneOn, CiMicrophoneOff } from "react-icons/ci";
+import { BsCameraVideoOff } from "react-icons/bs";
+import { BsCameraVideo } from "react-icons/bs";
 
 const pc_config = {
   //iceServers: [
@@ -36,7 +39,7 @@ const RoomVideosSection = ({
   return (
     <>
       <section
-        style={{ height: "100vh", width: "100vw", backgroundColor: "black" }}
+        style={{ height: "100vh", width: "100vw", backgroundColor: "#191819" }}
       >
         <Rnd
           default={{
@@ -54,7 +57,7 @@ const RoomVideosSection = ({
             muted={true}
             ref={localVideoRef}
             autoPlay
-            style={{ width: "100%", height: "100%" }}
+            style={{ width: "100%", height: "100%", borderRadius: "50px" }}
           />
         </Rnd>
 
@@ -90,14 +93,67 @@ const RoomVideosSection = ({
   );
 };
 
-const RoomFooter = () => {
+const RoomFooter = ({ MuteBtn, VideoBtn, isMuted, isCameraOn }) => {
   return (
     <footer>
       <div
-        className="fixed-bottom bg-primary mb-3 d-flex justify-content-center bg-opacity-50"
-        style={{ zIndex: 3, color: "white" }}
+        className="fixed-bottom  mb-3 d-flex justify-content-center bg-opacity-50"
+        style={{ zIndex: 3, backgroundColor: "#2A282A" }}
       >
-        asd
+        {isMuted ? (
+          <>
+            <button
+              onClick={MuteBtn}
+              className="btn"
+              style={{ color: "white" }}
+            >
+              <CiMicrophoneOn
+                style={{ color: "white", zIndex: "2", fontSize: "36px" }}
+              />
+              Mute
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={MuteBtn}
+              className="btn"
+              style={{ color: "white" }}
+            >
+              <CiMicrophoneOff
+                style={{ color: "white", zIndex: "2", fontSize: "36px" }}
+              />
+              Unmute
+            </button>
+          </>
+        )}
+        {isCameraOn ? (
+          <>
+            <button
+              onClick={VideoBtn}
+              className="btn"
+              style={{ color: "white" }}
+            >
+              <BsCameraVideoOff
+                style={{ color: "white", zIndex: "2", fontSize: "36px" }}
+              />
+              Cam on
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={VideoBtn}
+              className="btn"
+              style={{ color: "white" }}
+            >
+              <BsCameraVideo
+                style={{ color: "white", zIndex: "2", fontSize: "36px" }}
+              />
+              Cam off
+            </button>
+          </>
+        )}
       </div>
     </footer>
   );
@@ -119,28 +175,14 @@ const Video = ({ stream, muted, xPosition, yPosition }) => {
     return <></>;
   }
 
-  const MuteBtn = () => {
-    console.log(isMuted);
-    setIsMuted(!isMuted);
-  };
-
   return (
     <>
       <video
         muted={isMuted}
         ref={ref}
         autoPlay
-        style={{ width: "100%", height: "100%" }}
+        style={{ width: "100%", height: "100%", borderRadius: "50px" }}
       />
-      {/* {isMuted ? (
-        <>
-          <button onClick={MuteBtn}>마이크 온~</button>
-        </>
-      ) : (
-        <>
-          <button onClick={MuteBtn}>음소거~</button>
-        </>
-      )} */}
     </>
   );
 };
@@ -153,8 +195,8 @@ const Room = () => {
   const localVideoRef = useRef(null);
   const localStreamRef = useRef();
   const [users, setUsers] = useState([]);
-  const [isCameraOn, setIsCameraOn] = useState(true); // eslint-disable-line no-unused-vars
-  const [isMuted, setIsMuted] = useState(false);
+  const [isCameraOn, setIsCameraOn] = useState(false); // eslint-disable-line no-unused-vars
+  const [isMuted, setIsMuted] = useState(true);
 
   // Menu
   const [isMenuOn, setIsMenuOn] = useState(false);
@@ -182,20 +224,6 @@ const Room = () => {
     }
   }, []);
 
-  const MuteBtn = () => {
-    setIsMuted(!isMuted);
-    localStreamRef.current.getAudioTracks().forEach((track) => {
-      track.enabled = !isMuted;
-    });
-    GetLocalStream();
-  };
-  const VideoBtn = () => {
-    setIsCameraOn(!isCameraOn);
-    localStreamRef.current.getVideoTracks().forEach((track) => {
-      track.enabled = isCameraOn;
-    });
-    GetLocalStream();
-  };
   const CreatePeerConnection = useCallback((socketID) => {
     console.log(socketID);
     try {
@@ -264,7 +292,10 @@ const Room = () => {
   useEffect(() => {
     socketRef.current = io.connect(SOCKET_SERVER_URL);
     GetLocalStream();
-
+    if (localStreamRef.current) {
+      VideoBtn();
+      MuteBtn();
+    }
     //'similar to welcome'
     socketRef.current.on("all_users", (allUsers) => {
       // 모든 user들에 대해 다음과 같은 작업을 수행
@@ -323,7 +354,12 @@ const Room = () => {
         //console.log("peer b data channel creates");
 
         // 매개변수 꼭 확인하기!
-        await pc.setRemoteDescription(new RTCSessionDescription(sdp));
+        try {
+          await pc.setRemoteDescription(new RTCSessionDescription(sdp));
+          console.log("Answer Set Remote Description Success");
+        } catch (e) {
+          console.error(e);
+        }
         console.log("Answer Set Remote Description Success");
         const localSdp = await pc.createAnswer({
           offerToReceiveVideo: true,
@@ -382,6 +418,25 @@ const Room = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const MuteBtn = () => {
+    const handleBtn = () => {
+      setIsMuted(!isMuted);
+      localStreamRef.current.getAudioTracks().forEach((track) => {
+        track.enabled = !isMuted;
+      });
+    };
+    handleBtn();
+  };
+  const VideoBtn = () => {
+    const handleBtn = () => {
+      setIsCameraOn(!isCameraOn);
+      localStreamRef.current.getVideoTracks().forEach((track) => {
+        track.enabled = isCameraOn;
+      });
+    };
+    handleBtn();
+  };
+
   return (
     <>
       <RoomHeader />
@@ -390,11 +445,14 @@ const Room = () => {
         isMuted={isMuted}
         isCameraOn={isCameraOn}
         localVideoRef={localVideoRef}
-        MuteBtn={MuteBtn}
-        VideoBtn={VideoBtn}
       />
 
-      <RoomFooter />
+      <RoomFooter
+        MuteBtn={MuteBtn}
+        isMuted={isMuted}
+        VideoBtn={VideoBtn}
+        isCameraOn={isCameraOn}
+      />
     </>
   );
 };
