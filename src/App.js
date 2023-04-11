@@ -2,9 +2,7 @@ import "./App.css";
 import io from "socket.io-client";
 import { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
-import Whiteboard from "./components/Whiteboard";
-import Draggable from "react-draggable";
-import { ResizableBox } from "react-resizable";
+
 import { Rnd } from "react-rnd";
 const pc_config = {
   iceServers: [
@@ -308,32 +306,8 @@ const App = () => {
 
   return (
     <div>
-      {showWhiteboard && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "white",
-            zIndex: 1,
-          }}
-          className="d-flex justify-content-center align-items-center"
-        >
-          {/* Whiteboard component */}
-          <Whiteboard
-            SOCKET_SERVER_URL={SOCKET_SERVER_URL}
-            dataChannel={dataChannel}
-            lines={lines}
-            pcsRef={pcsRef}
-            setLines={setLines}
-          />
-        </div>
-      )}
       <div>
         <Rnd
-          className="border"
           default={{
             x: 1600,
             y: 30,
@@ -348,10 +322,6 @@ const App = () => {
             autoPlay
             style={{ width: "100%", height: "100%" }}
           />
-          <button onClick={MuteBtn}>{isMuted ? "Unmute" : "Mute"}</button>
-          <button onClick={VideoBtn}>
-            {isCameraOn ? "Turn off camera" : "Turn on camera"}
-          </button>
         </Rnd>
 
         {users.map((user, index) => (
@@ -367,6 +337,11 @@ const App = () => {
         className="fixed-bottom bg-primary mb-3 d-flex justify-content-center bg-opacity-50"
         style={{ zIndex: 3 }}
       >
+        {" "}
+        <button onClick={MuteBtn}>{isMuted ? "Unmute" : "Mute"}</button>
+        <button onClick={VideoBtn}>
+          {isCameraOn ? "Turn off camera" : "Turn on camera"}
+        </button>
         <div className="text-light text-center p-3">
           <i className="fa-duotone fa-microphone"></i>
         </div>
