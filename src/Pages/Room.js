@@ -55,10 +55,10 @@ const RoomVideosSection = ({
             }}
           >
             <button onClick={MuteBtn}>{isMuted ? (
-              <>Unmute</>
-            ) : (<>Mute</>)}</button>
-            <button onClick={VideoBtn}>{isCameraOn ? (<>Turn Off Camera</>)
-            : (<>Turn On Camera</>)}</button>
+              <i className="fa-solid fa-microphone"></i>
+            ) : (<i className="fa-solid fa-microphone-slash"></i>)}</button>
+            <button onClick={VideoBtn}>{isCameraOn ? (<i className="fa-solid fa-camera-slash"></i>)
+            : (<i className="fa-solid fa-camera"></i>)}</button>
           </video>
         </Rnd>
       </div>
