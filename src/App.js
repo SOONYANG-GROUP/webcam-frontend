@@ -76,6 +76,8 @@ const Video = ({ stream, muted, xPosition, yPosition }) => {
 };
 
 const App = () => {
+  
+
   const socketRef = useRef();
   const pcsRef = useRef({});
   const localVideoRef = useRef(null);
