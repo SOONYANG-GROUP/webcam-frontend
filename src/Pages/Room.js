@@ -20,6 +20,77 @@ const pc_config = {
 const SOCKET_SERVER_URL = "http://localhost:5000";
 //const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
 
+
+const RoomVideosSection = ({
+  users,
+  isMuted,
+  isCameraOn,
+  localVideoRef,
+  MuteBtn,
+  VideoBtn
+}) => {
+  return(
+    <div>
+      <div>
+        <Rnd
+          className="border"
+          default={{
+            x: 1600,
+            y: 30,
+            width: 320,
+            height: "auto"
+          }}
+          style={{ 
+            zIndex: 2,
+          }}
+        >
+          <video
+            muted={true}
+            ref={localVideoRef}
+            autoPlay
+            style={{ 
+              width: "100%", 
+              height: "100%",
+              borderRadius: "10%"
+            }}
+          >
+            <button onClick={MuteBtn}>{isMuted ? (
+              <>Unmute</>
+            ) : (<>Mute</>)}</button>
+            <button onClick={VideoBtn}>{isCameraOn ? (<>Turn Off Camera</>)
+            : (<>Turn On Camera</>)}</button>
+          </video>
+        </Rnd>
+      </div>
+      <div>
+          {users.map((user, index) => (
+            <Video 
+              key={index}
+              stream={user.stream}
+              xPosition={1600}
+              yPosition={(index + 1) * 300 + 30}
+            />
+          ))}
+      </div>
+    </div>
+  )
+}
+
+const RoomFooter = () => {
+  return(
+    <footer>
+        <div
+          className="fixed-bottom bg-primary mb-3 d-flex justify-content-center bg-opacity-50"
+          style={{ zIndex: 3 }}
+        >
+        <div className="text-light text-center p-3">
+          <i className="fa-duotone fa-microphone"></i>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
 const Video = ({ stream, muted, xPosition, yPosition }) => {
   const ref = useRef(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -306,46 +377,21 @@ const Room = () => {
 
   return (
     <div>
-      <div>
-        <Rnd
-          className="border"
-          default={{
-            x: 1600,
-            y: 30,
-            width: 320,
-            height: "auto",
-          }}
-          style={{ zIndex: 2 }}
-        >
-          <video
-            muted={true}
-            ref={localVideoRef}
-            autoPlay
-            style={{ width: "100%", height: "100%" }}
-          />
-          <button onClick={MuteBtn}>{isMuted ? "Unmute" : "Mute"}</button>
-          <button onClick={VideoBtn}>
-            {isCameraOn ? "Turn off camera" : "Turn on camera"}
-          </button>
-        </Rnd>
 
-        {users.map((user, index) => (
-          <Video
-            key={index}
-            stream={user.stream}
-            xPosition={1600}
-            yPosition={(index + 1) * 300 + 30}
-          />
-        ))}
-      </div>
-      <div
-        className="fixed-bottom bg-primary mb-3 d-flex justify-content-center bg-opacity-50"
-        style={{ zIndex: 3 }}
-      >
-        <div className="text-light text-center p-3">
-          <i className="fa-duotone fa-microphone"></i>
-        </div>
-      </div>
+
+      <RoomVideosSection 
+        users={users}
+        isMuted={isMuted}
+        isCameraOn={isCameraOn}
+        localVideoRef={localVideoRef}
+        MuteBtn={MuteBtn}
+        VideoBtn={VideoBtn}
+      />
+
+
+      <RoomFooter />
+
+
     </div>
   );
 };
