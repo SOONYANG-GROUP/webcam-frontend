@@ -1,27 +1,24 @@
-import "./App.css";
 import io from "socket.io-client";
 import { useCallback, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import Whiteboard from "./components/Whiteboard";
-import Draggable from "react-draggable";
-import { ResizableBox } from "react-resizable";
 import { Rnd } from "react-rnd";
 const pc_config = {
-  iceServers: [
-    {
-      urls: [
-        "stun:stun.l.google.com:19302",
-        "stun:stun1.l.google.com:19302",
-        "stun:stun2.l.google.com:19302",
-        "stun:stun3.l.google.com:19302",
-        "stun:stun4.l.google.com:19302",
-      ],
-    },
-  ],
+  //iceServers: [
+  //  {
+  //    urls: [
+  //      "stun:stun.l.google.com:19302",
+  //      "stun:stun1.l.google.com:19302",
+  //      "stun:stun2.l.google.com:19302",
+  //      "stun:stun3.l.google.com:19302",
+  //      "stun:stun4.l.google.com:19302",
+  //    ],
+  //  },
+  //],
 };
-const roomName = "1234";
-//const SOCKET_SERVER_URL = "http://localhost:5000";
-const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
+//const roomName = "1234";
+const SOCKET_SERVER_URL = "http://localhost:5000";
+//const SOCKET_SERVER_URL = "https://webcam-backend-13oo.onrender.com";
 
 const Video = ({ stream, muted, xPosition, yPosition }) => {
   const ref = useRef(null);
@@ -75,7 +72,9 @@ const Video = ({ stream, muted, xPosition, yPosition }) => {
   );
 };
 
-const App = () => {
+const Room = () => {
+  const location = useLocation();
+  const roomName = location.pathname.split('/')[2];
   const socketRef = useRef();
   const pcsRef = useRef({});
   const localVideoRef = useRef(null);
@@ -200,12 +199,11 @@ const App = () => {
         pcsRef.current = { ...pcsRef.current, [user.id]: pc };
         try {
           // Create Channel
-
-          dataChannel.current = pc.createDataChannel("chat");
-          dataChannel.current.addEventListener("message", (event) => {
-            setLines((prevLines) => [...prevLines, JSON.parse(event.data)]);
-          });
-          console.log("made data channel");
+          //dataChannel.current = pc.createDataChannel("chat");
+          //dataChannel.current.addEventListener("message", (event) => {
+          //  setLines((prevLines) => [...prevLines, JSON.parse(event.data)]);
+          //});
+          //console.log("made data channel");
 
           // offer를 만드는 중
           const localSdp = await pc.createOffer({
@@ -238,13 +236,13 @@ const App = () => {
       pcsRef.current = { ...pcsRef.current, [offerSendID]: pc };
       try {
         // Data Channel 만들기
-        pc.addEventListener("datachannel", (event) => {
-          dataChannel.current = event.channel;
-          dataChannel.current.addEventListener("message", (event) => {
-            setLines((prevLines) => [...prevLines, JSON.parse(event.data)]);
-          });
-        });
-        console.log("peer b data channel creates");
+        //pc.addEventListener("datachannel", (event) => {
+        //  dataChannel.current = event.channel;
+        //  dataChannel.current.addEventListener("message", (event) => {
+        //    setLines((prevLines) => [...prevLines, JSON.parse(event.data)]);
+        //  });
+        //});
+        //console.log("peer b data channel creates");
 
         // 매개변수 꼭 확인하기!
         await pc.setRemoteDescription(new RTCSessionDescription(sdp));
@@ -308,29 +306,6 @@ const App = () => {
 
   return (
     <div>
-      {showWhiteboard && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "white",
-            zIndex: 1,
-          }}
-          className="d-flex justify-content-center align-items-center"
-        >
-          {/* Whiteboard component */}
-          <Whiteboard
-            SOCKET_SERVER_URL={SOCKET_SERVER_URL}
-            dataChannel={dataChannel}
-            lines={lines}
-            pcsRef={pcsRef}
-            setLines={setLines}
-          />
-        </div>
-      )}
       <div>
         <Rnd
           className="border"
@@ -375,4 +350,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Room;
