@@ -2,7 +2,9 @@ import "./App.css";
 import io from "socket.io-client";
 import { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
-
+import Whiteboard from "./components/Whiteboard";
+import Draggable from "react-draggable";
+import { ResizableBox } from "react-resizable";
 import { Rnd } from "react-rnd";
 const pc_config = {
   iceServers: [
@@ -74,34 +76,15 @@ const Video = ({ stream, muted, xPosition, yPosition }) => {
 };
 
 const App = () => {
-  const socketRef = useRef();
-  const pcsRef = useRef({});
-  const localVideoRef = useRef(null);
-  const dataChannel = useRef(); // eslint-disable-line no-unused-vars
-  const localStreamRef = useRef();
-  const [users, setUsers] = useState([]);
-  const [showWhiteboard, setShowWhiteboard] = useState(true); // eslint-disable-line no-unused-vars
-  const [isCameraOn, setIsCameraOn] = useState(true); // eslint-disable-line no-unused-vars
-  const [isMicOn, setIsMicOn] = useState(true); // eslint-disable-line no-unused-vars
-  const [lines, setLines] = useState([]);
-  const [isMuted, setIsMuted] = useState(false);
-  const GetLocalStream = useCallback(async () => {
-    try {
-      // 로컬 스트림 정보 받아오기
-      const localStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true,
-      });
-      localStreamRef.current = localStream;
-      if (localVideoRef.current) localVideoRef.current.srcObject = localStream;
-      if (!socketRef.current) return;
-      socketRef.current.emit("join_room", {
-        room: roomName,
-      });
-    } catch (e) {
-      console.log(`getUserMedia error: ${e}`);
-    }
-  }, []);
+  return(
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/room/:id" element={<Room />} />
+      </Routes>
+    </Router>
+  )
+}
 
   const MuteBtn = () => {
     setIsMuted(!isMuted);
