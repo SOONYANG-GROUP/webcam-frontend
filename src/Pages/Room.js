@@ -3,9 +3,12 @@ import { useCallback, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Rnd } from "react-rnd";
-import { CiMicrophoneOn, CiMicrophoneOff } from "react-icons/ci";
-import { BsCameraVideoOff } from "react-icons/bs";
-import { BsCameraVideo } from "react-icons/bs";
+import {
+  FaMicrophone,
+  FaMicrophoneSlash,
+  FaVideo,
+  FaVideoSlash,
+} from "react-icons/fa";
 
 const pc_config = {
   //iceServers: [
@@ -39,7 +42,7 @@ const RoomVideosSection = ({
   return (
     <>
       <section
-        style={{ height: "100vh", width: "100vw", backgroundColor: "#191819" }}
+        style={{ height: "100vh", width: "100vw", backgroundColor: "#191919" }}
       >
         <Rnd
           default={{
@@ -54,6 +57,7 @@ const RoomVideosSection = ({
           lockAspectRatio="true"
         >
           <video
+            className="rounded-3"
             muted={true}
             ref={localVideoRef}
             autoPlay
@@ -94,66 +98,56 @@ const RoomVideosSection = ({
 };
 
 const RoomFooter = ({ MuteBtn, VideoBtn, isMuted, isCameraOn }) => {
+  const EndCallBtn = () => {
+    window.open("", "_self");
+    window.close();
+  };
   return (
     <footer>
       <div
-        className="fixed-bottom  mb-3 d-flex justify-content-center bg-opacity-50"
-        style={{ zIndex: 3, backgroundColor: "#2A282A" }}
+        className="fixed-bottom mb-3 d-flex flex-column align-items-center justify-content-center bg-opacity-50"
+        style={{ zIndex: 3, color: "white" }}
       >
-        {isMuted ? (
-          <>
-            <button
-              onClick={MuteBtn}
-              className="btn"
-              style={{ color: "white" }}
-            >
-              <CiMicrophoneOn
-                style={{ color: "white", zIndex: "2", fontSize: "36px" }}
-              />
-              Mute
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              onClick={MuteBtn}
-              className="btn"
-              style={{ color: "white" }}
-            >
-              <CiMicrophoneOff
-                style={{ color: "white", zIndex: "2", fontSize: "36px" }}
-              />
-              Unmute
-            </button>
-          </>
-        )}
-        {isCameraOn ? (
-          <>
-            <button
-              onClick={VideoBtn}
-              className="btn"
-              style={{ color: "white" }}
-            >
-              <BsCameraVideoOff
-                style={{ color: "white", zIndex: "2", fontSize: "36px" }}
-              />
-              Cam on
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              onClick={VideoBtn}
-              className="btn"
-              style={{ color: "white" }}
-            >
-              <BsCameraVideo
-                style={{ color: "white", zIndex: "2", fontSize: "36px" }}
-              />
-              Cam off
-            </button>
-          </>
-        )}
+        <div className="mb-3" tyle={{ color: "white" }}>
+          비디오의 크기 및 위치를 마우스로 조절 가능합니다.
+        </div>
+        <div>
+          <button
+            onClick={MuteBtn}
+            className="btn mx-2 rounded-3"
+            style={{ border: "1px solid #999999", color: "white" }}
+          >
+            {isMuted ? (
+              <div>
+                <FaMicrophoneSlash size={21} />
+                <div>Mute On</div>
+              </div>
+            ) : (
+              <div>
+                <FaMicrophone size={18} />
+                <div>Mute Off</div>
+              </div>
+            )}
+          </button>
+          <button
+            onClick={VideoBtn}
+            className="btn mx-2 rounded-3"
+            style={{ border: "1px solid #999999", color: "white" }}
+          >
+            {isCameraOn ? (
+              <div>
+                <FaVideo size={18} />
+                <div>Cam On</div>
+              </div>
+            ) : (
+              <div>
+                <FaVideoSlash size={18} />
+                <div>Cam Off</div>
+              </div>
+            )}
+          </button>
+          {/* <button onClick={EndCallBtn}>종료하기</button> */}
+        </div>
       </div>
     </footer>
   );
@@ -178,6 +172,7 @@ const Video = ({ stream, muted, xPosition, yPosition }) => {
   return (
     <>
       <video
+        className="rounded-3"
         muted={isMuted}
         ref={ref}
         autoPlay
@@ -224,6 +219,18 @@ const Room = () => {
     }
   }, []);
 
+  const MuteBtn = () => {
+    setIsMuted(!isMuted);
+    localStreamRef.current.getAudioTracks().forEach((track) => {
+      track.enabled = !isMuted;
+    });
+  };
+  const VideoBtn = () => {
+    setIsCameraOn(!isCameraOn);
+    localStreamRef.current.getVideoTracks().forEach((track) => {
+      track.enabled = isCameraOn;
+    });
+  };
   const CreatePeerConnection = useCallback((socketID) => {
     console.log(socketID);
     try {
@@ -331,6 +338,8 @@ const Room = () => {
           console.error(e);
         }
       });
+      // VideoBtn();
+      // MuteBtn();
     });
 
     // Offer를 받은 경우 (2번 끝)
@@ -415,42 +424,19 @@ const Room = () => {
         delete pcsRef.current[user.id];
       });
     };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const MuteBtn = () => {
-    const handleBtn = () => {
-      setIsMuted(!isMuted);
-      localStreamRef.current.getAudioTracks().forEach((track) => {
-        track.enabled = !isMuted;
-      });
-    };
-    handleBtn();
-  };
-  const VideoBtn = () => {
-    const handleBtn = () => {
-      setIsCameraOn(!isCameraOn);
-      localStreamRef.current.getVideoTracks().forEach((track) => {
-        track.enabled = isCameraOn;
-      });
-    };
-    handleBtn();
-  };
 
   return (
     <>
       <RoomHeader />
-      <RoomVideosSection
-        users={users}
-        isMuted={isMuted}
-        isCameraOn={isCameraOn}
-        localVideoRef={localVideoRef}
-      />
+      <RoomVideosSection users={users} localVideoRef={localVideoRef} />
 
       <RoomFooter
         MuteBtn={MuteBtn}
-        isMuted={isMuted}
         VideoBtn={VideoBtn}
+        isMuted={isMuted}
         isCameraOn={isCameraOn}
       />
     </>
